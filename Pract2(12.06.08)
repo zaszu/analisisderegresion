@@ -1,0 +1,33 @@
+
+rm(list _ ls())#limpiar entorno d  etrabajo 
+#control+l limpia la consola 
+setwd("C://Users//SALA-C19.RTIC-C19-HP//Desktop") #definir el directorio de raiz 
+require(foreign)
+SDEMT215 <- data.frame(read.dbf("SDEMT215.dbf"))
+install.packages("questionr")
+require(questionr)
+wtd.table(SDEMT215$POS_OCU)#OCUAPACION 
+wtd.table(SDEMT215$POS_OCU,na.show = TRUE)#muestra valores perdidos
+#frecuencia con datoas pondrados datos expandidos
+wtd.table(SDEMT215$POS_OCU,weights=SDEMT215$FAC,na.show = TRUE)
+# tabulados con datos muestrales (sin ponderar)
+#metodo 1
+wtd.table(SDEMT215$SEX,SDEMT215$POS_OCU)
+#TABULADOS CON DATOS PONDERADOS 
+wtd.table(SDEMT215$SEX,SDEMT215$POS_OCU,weights=SDEMT215$FAC)
+##ejercicio
+#1)obtener la frecuencia de la var clase1(muestral)
+#obtener el tabulado de entidad y sexo(muestral y ponderado)
+wtd.table(SDEMT215$CLASE1)
+wtd.table(SDEMT215$ENT,SDEMT215$SEX,weights=SDEMT215$FAC)
+data.frame(wtd.table(SDEMT215$ENT,SDEMT215$SEX,weights=SDEMT215$FAC),wtd.table(SDEMT215$ENT,SDEMT215$SEX))
+wtd.table(SDEMT215$ENT,SDEMT215$SEX,na.show = TRUE)
+ #ETIQUETAR EN OTRA VARIABLE categorias o niveles y nombres 
+SDEMT215$SEXO <- factor(SDEMT215$SEX,levels = c(1,2), labels = c("hombre","mujer"))
+wtd.table(SDEMT215$SEX)# MUESTRA DATOS
+wtd.table(SDEMT215$SEXO)#ETIQUETA 
+SDEMT215$POS_OCU <- factor(SDEMT215$POS_OCU,levels = c(1,2,3,4,5),
+                           labels = c("subordinadas","empleadores","cuentapropia","sin pago","NE"))
+wtd.table(SDEMT215$POS_OCU)
+#TAREA
+SDEMT215$CS_NR_ORI <- factor(SDEMT215$SEX,levels = c(1,2,3,9), labels = c("hombre","mujer"))
