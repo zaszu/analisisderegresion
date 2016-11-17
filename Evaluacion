@@ -1,0 +1,26 @@
+install.packages("foreign")
+require(foreign)
+install.packages("questionr")
+require(questionr)
+setwd("C://Users//Sala-C8_2//Downloads")
+bas<-data.frame(read.spss("solorural.sav"))
+
+##Sexo
+var<-c("sex","pos_ocu")
+bas1<-bas[,var]
+table(bas1$sex)
+mujeres<-subset(bas,bas$sex=="mujeres")
+hombres<-subset(bas,bas$sex=="hombres")
+##hombres mujeres 
+##9302    8798
+####edad
+
+wtd.table(bas$sex,bas$eda1,weights =bas$fac_mti)
+
+bas$eda1[as.numeric(mujeres$eda)>=5& as.numeric(mujeres$eda)<=17]<-1
+bas$eda1[as.numeric(mujeres$eda)>=10& as.numericmujeres$eda)<=13]<-2
+bas$eda1[as.numeric(mujeres$eda)>=14& as.numeric(mujeres$eda)<=17]<-3
+table(mujeres$eda1)
+
+##asiste a la escuela 
+data.frame(wtd.table(bas1$sex,bas$ocu_jefe,weights =bas$FAC))
