@@ -1,0 +1,128 @@
+install.packages("foreign")
+require(foreign)
+install.packages("questionr")
+require(questionr)
+setwd("C://Users//Sala-C8_2//Downloads")
+bas<-data.frame(read.spss("solorural.sav"))
+
+mujeres<-subset(bas,(bas$sex)=="mujeres")
+hombres<-subset(bas,(bas$sex)=="hombres")
+
+
+wtd.table(bas$sex,weights = bas$fac_mti)
+### mujeres expandido hay 3800117 y 4061217 hombres 
+## en total 7861334
+##  el tamaño de muestra   mujeres 8798 y 9302 hombres
+## el total de la muestra son 18100
+
+## poblacion de 5 a 17 años (sin expandir)
+table(bas$eda1)
+m5_17<-table (mujeres$eda1)
+sum(m5_17)
+### las mujeres de 5 a 17 años son 8798
+h5_17<-table (hombres$eda1)
+sum(h5_17)
+###  los hombres de 5 a 17 años son 9302
+### en total la poblacion de 5-17 son 18100
+
+## poblacion de 5 a 17 años (expandidos)
+wtd.table(bas$sex,bas$eda1,weights = bas$fac_mti)
+##hombres 4061217
+##mujeres 3800117
+##total 7861334
+##Ocupados (sin expandir)
+table(bas$sex,bas$clase2=="1")
+### el numero de ocupados son 1888
+### mujeres ocupadas son 474
+###hombres ocupados 1414
+
+##Ocupados (expandidos)
+wtd.table(bas$sex,bas$clase2=="1",weights = bas$fac_mti)
+###hombres ocupados 622492
+## mujeres ocupadas 204970
+##total 827462
+## Porcentaje de Ocupados respecto al total
+## hombres
+1414 *100/4061217
+## mujeres
+474 *100/3800117
+## Total
+1888 *100/7861334
+## hombres       mujeres      Total
+## 0.03481715  0.0124733  0.02401628 
+
+
+## CARACTERÍSTICAS INDIVIDUALES
+## Ocupados por Grupos de Edad
+ocu<-subset(bas,bas$clase2==1)
+class(ocu$eda)
+ocu$eda1[as.numeric(ocu$eda) >= 5 & as.numeric(ocu$eda)<= 9] <- 1
+ocu$eda1[as.numeric(ocu$eda) >= 10 & as.numeric(ocu$eda)<= 13] <- 2
+ocu$eda1[as.numeric(ocu$eda) >= 14 & as.numeric(ocu$eda)<= 17] <- 3
+table (ocu$eda1,ocu$eda)
+## De 5 a 9
+## No hay  ocupados en el rango de edad
+## De 10 a 13
+wtd.table (ocu$sex, ocu$eda1==2,weights=ocu$fac_mti)
+## hombres 121416     
+##mujeres  37279 
+##total 158695 
+## De 14 a 17
+wtd.table (ocu$sex, ocu$eda1==3,weights=ocu$fac_mti)
+## hombres 501076   
+##mujeres  167691
+##total 668767  
+
+##Ocupados según asistencia escolar
+wtd.table (ocu$asis, ocu$sex,weights=ocu$fac_mti)
+##            hombres  mujeres  Total
+## Asiste     335572   107060   442632
+## No Asiste  286920   97910    384830
+
+
+## CARACTERÍSTICAS DEL HOGAR
+## Tamaño del hogar
+wtd.table (ocu$tam_hog, ocu$sex,weights=ocu$fac_mti)
+##                     hombres  mujeres  Total
+## 1 a 3 integrantes   55181    25618    80799
+## 4 a 5 integrantes   149312   44721    194033
+## 6 a 7 intengrantes  65844    21472    87316
+## 8 y más             35190    8830     44020
+## Sexo del jefe del hogar
+wtd.table (ocu$sex_jefe, ocu$sex,weights=ocu$fac_mti)
+##          hombres  mujeres
+## Hombre   248915   78322
+## Mujer    56612    22319
+##Fin de la conversación
+ninrocu<-subset(bas,bas$c_ocu=="ocupado")
+#########################################################################################################
+##Recodificar 
+install.packages("plyr")
+library(plyr)
+ninrocu$t_per<-revalue(factor(ninrocu$t_per),c("4"=NA))
+ninrocu$escol_jefe<-revalue(factor(ninrocu$escol_jefe),c("7"=NA))
+table(ninrocu$escol_jefe)
+table(ninrocu$t_per)
+table(ninrocu$sex)
+table(ninrocu$eda1)
+ninrocu$eda1<-factor (ninrocu$eda1, levels =c("1","2","3"),labels=c("5-9","10-13","14-17"))##etiqueta
+
+table(ninrocu$eda)
+table(ninrocu$eda1,ninrocu$eda)
+table(ninrocu$asis)
+table(ninrocu$ocu_jefe)
+table(ninrocu$t_apo1)
+
+ninrocu$t_per<-factor (ninrocu$t_per, levels =c("1","2","3","4"),labels=c("es un familiar","no es un familiar","trabaja por su cuenta","no sabe"))
+table(ninrocu$t_per)##
+ninrocu$t_per<-revalue(factor(ninrocu$t_per),c("4"=NA))##elimina
+#####################
+require(nnet)
+mod1<-multinom(t_per~1,data=ninrocu,trace=FALSE)
+modfin<-multinom(t_per~sex+eda1+asis+sex_jefe+escol_jefe+t_apo1+ocu_jefe, data=ninrocu)
+g<-summary(modfin,wald=T)
+print(g)
+install.packages("stargazer")
+require(stargazer)
+s<-stargazer(modfin,type="html",title="coefficients", summary=T)
+stargazer(modfin,type="text",title="mlogit", digits=2,out="C://Users//Sala-C8_2//Downloads//gax.txt")
