@@ -1,0 +1,24 @@
+  ### SCRIPT CLASE 11
+asa1 <- (read.csv("C:\\Users\\Sala-D\\Downloads\\Enoe.csv"))
+
+asa <- data.frame(read.csv("C:\\Users\\Sala-D\\Downloads\\Enoe.csv", header = T)[7,2:49])
+asat<- t (asa) ##transponer
+asa<- as.numeric(asat)##ST en numerico 
+asat<- ts(asa, start=2005, frequency=4)
+
+#####################################SUAVISADO EXPONENCIAL EN R
+require (forecast)
+mod1 <- ses(asat, alpha= 0.1, initial= "simple", h=8)
+mod2 <- ses(asat, alpha= 0.3, initial= "simple", h=8)
+mod3 <- ses(asat, alpha= .95, initial= "simple", h=8)
+
+plot(mod1, ylab="asalariados"
+     xlab="aA", main="asalariados",type="o")
+lines(mod1$fitted, col="brown", type="o")
+lines(mod2$fitted, col="red", type="o")
+lines(mod3$fitted, col="green", type="o")
+lines(mod1$mean, col="brown", type="o")
+lines(mod2$mean, col="red", type="o")
+lines(mod3$mean, col="green", type="o")
+legend("topleft", lty=1, col=c(1,"blue","read","green"),
+       c("data", expression(alpha==0,1),expresion(alpha==0,3), expresion (alpha==1), pch=11))
