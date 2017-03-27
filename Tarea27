@@ -1,0 +1,35 @@
+##tarea
+desoc<-read.csv("C:\\Users\\Sala-D\\Downloads\\tarea2.csv")
+desocorst<-ts(desoc,frequency=4,start=2005)
+decocts<-desoc[1:24,]
+basest<-ts(decocts,frequency=4,start=2005)
+plot(basest)
+
+
+acf(basest)
+acf(desocorst)
+install.packages("forecast")   ##finanzas, es muy lineal. 
+require (forecast)
+
+rwf(basest, h= 20,drift=TRUE)
+rwf(desocorst, h= 20,drift=TRUE)
+
+
+desco<-decompose(desocorst)
+
+
+plot(tend1,col=05, main="tendencia desocupación",ylab="tasas",xlab="años")
+
+desocmod1 <- meanf(basest, h=20)## Metodo del promedio
+desocmod2 <- naive(basest, h=20)
+desocmod3 <- snaive(basest, h=20)
+desocmod4 <- rwf(basest, h=20, drift=T)
+
+
+plot(desocorst,
+     main="pronostico de desocupacion trimestral")
+(desocmod2$mean,col=1)## residuals
+lines(desocmod3$mean,col=99)
+lines(desocmod4$mean,col=217)
+legend("topleft", lty=1,col=c(1,99,217),
+       legend=c("media","ingenuo","ingenuo estacional","deriva"))
